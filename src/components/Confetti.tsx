@@ -25,8 +25,8 @@ const PARTICLE_COUNT = 50
 export function Confetti({ trigger, buttonRect, onComplete }: ConfettiProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const particlesRef = useRef<ConfettiParticle[]>([])
-  const animationRef = useRef<number>()
-  const startTimeRef = useRef<number>()
+  const animationRef = useRef<number | undefined>(undefined)
+  const startTimeRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     if (!trigger || !buttonRect || !containerRef.current) return
