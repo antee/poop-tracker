@@ -68,12 +68,12 @@ function App() {
     setRev((r) => r + 1)
   }
 
-  function onQuickSetToday(state: DayState) {
+  function onQuickSetToday(state: DayState, fromPoopButton: boolean = false) {
     setDayState(today, state)
     setRev((r) => r + 1)
     
-    // Trigger confetti for poop button (only if not already active)
-    if (state === 'P' && poopButtonRef.current && !isConfettiActive) {
+    // Trigger confetti only for poop button (only if not already active)
+    if (state === 'P' && fromPoopButton && poopButtonRef.current && !isConfettiActive) {
       setButtonRect(poopButtonRef.current.getBoundingClientRect())
       setConfettiTrigger(prev => prev + 1)
       setIsConfettiActive(true)
@@ -132,7 +132,7 @@ function App() {
                 ref={poopButtonRef}
                 type="button"
                 className="h-14 rounded-xl text-2xl bg-amber-500 text-white active:opacity-90"
-                onClick={() => onQuickSetToday('P')}
+                onClick={() => onQuickSetToday('P', true)}
                 aria-label="Sätt idag till bajs"
               >
                 💩
