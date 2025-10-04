@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef } from 'react'
 import type { DayState, WeekRange } from './types'
 import { addDays, formatIso, formatWeekRange, fromIsoDate, getWeekRangeForDate, listDaysInRange, startOfWeekMonday, toIsoDate, todayIso } from './lib/date'
 import { getAllEntries, getDayState, getEarliestDateIso, setDayState, toggleDayState } from './lib/storage'
+import { Confetti } from './components/Confetti'
 
 type WeekBlock = {
   range: WeekRange
@@ -55,6 +56,10 @@ function buildWeeks(): WeekBlock[] {
 
 function App() {
   const [rev, setRev] = useState(0)
+  const [confettiTrigger, setConfettiTrigger] = useState(0)
+  const [buttonRect, setButtonRect] = useState<DOMRect | null>(null)
+  const [isConfettiActive, setIsConfettiActive] = useState(false)
+  const poopButtonRef = useRef<HTMLButtonElement>(null)
   const weeks = useMemo(() => buildWeeks(), [rev])
   const today = todayIso()
 
@@ -66,6 +71,18 @@ function App() {
   function onQuickSetToday(state: DayState) {
     setDayState(today, state)
     setRev((r) => r + 1)
+    
+    // Trigger confetti for poop button (only if not already active)
+    if (state === 'P' && poopButtonRef.current && !isConfettiActive) {
+      setButtonRect(poopButtonRef.current.getBoundingClientRect())
+      setConfettiTrigger(prev => prev + 1)
+      setIsConfettiActive(true)
+    }
+  }
+
+  function handleConfettiComplete() {
+    setButtonRect(null)
+    setIsConfettiActive(false)
   }
 
   return (
@@ -112,6 +129,7 @@ function App() {
           <div className="mx-auto max-w-md px-4 pb-[calc(env(safe-area-inset-bottom,0)+12px)] pt-2 bg-white/95 backdrop-blur border-t border-gray-200">
             <div className="grid grid-cols-2 gap-3">
               <button
+                ref={poopButtonRef}
                 type="button"
                 className="h-14 rounded-xl text-2xl bg-amber-500 text-white active:opacity-90"
                 onClick={() => onQuickSetToday('P')}
@@ -131,6 +149,12 @@ function App() {
           </div>
         </div>
       </div>
+      
+      <Confetti 
+        trigger={confettiTrigger}
+        buttonRect={buttonRect}
+        onComplete={handleConfettiComplete}
+      />
     </div>
   )
 }
